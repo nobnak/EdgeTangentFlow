@@ -1,0 +1,33 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Sobel
+
+Texture2D<float> Input1;
+Texture2D<float4> Input4;
+
+RWTexture2D<float4> Output4;
+
+[numthreads(8,8,1)]
+void Sobel (uint3 id : SV_DispatchThreadID) {
+    float c00 = Input1[id.xy + int2(-1, -1)];
+    float c10 = Input1[id.xy + int2( 0, -1)];
+    float c20 = Input1[id.xy + int2( 1, -1)];
+
+    float c01 = Input1[id.xy + int2(-1,  0)];
+    //float c11 = Input1[id.xy + int2( 0,  0)];
+    float c21 = Input1[id.xy + int2( 1,  0)];
+
+    float c02 = Input1[id.xy + int2(-1,  1)];
+    float c12 = Input1[id.xy + int2( 0,  1)];
+    float c22 = Input1[id.xy + int2( 1,  1)];
+
+    float dx = ((c20 + 2 * c21 + c22) - (c00 + 2 * c01 + c02)) / 8;
+    float dy = ((c02 + 2 * c12 + c22) - (c00 + 2 * c10 + c20)) / 8;
+
+    float2 grad = float2(dx, dy);
+    Output4[id.xy] = float4(grad, length(grad), 0);
+}
+[numthreads(8,8,1)]
+void Tangent (uint3 id : SV_DispatchThreadID) {
+    float4 grad = Input4[id.xy];
+    float4 tangent = 
+}
